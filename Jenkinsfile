@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        GitBranch = "main"
+        GitBranch = "packer"
     }
     
     stages {
@@ -10,16 +10,10 @@ pipeline {
                 cleanWs()
             }
         }
-        stage("check Vars"){
-            steps {
-                sh "echo $APP_NAME"
-                sh "echo $ENV"
-            }
-        }
         stage("checkout git") {
             steps {
                 sh "pwd"
-                dir("DeployInfra") {
+                dir("DeployPacker") {
                     sh "pwd"
                     git(
                         url: 'git@github.com:Barraque/tpaws.git',
@@ -30,18 +24,12 @@ pipeline {
                 }
             }
         }
-        stage("Deploy Infra") {
+        stage("Create AMi ") {
             steps {
-                dir("DeployInfra") {
-                    sh "pwd"
-                    sh "ls"
-                    
-                    sh "terraform init -backend-config='bucket=bucketdemorts' -backend-config='key=$APP_NAME/$ENV/terraform.tfstate' -backend-config='region=eu-west-1'"
-                    sh "terraform apply -auto-approve"
+                dir("DeployPacker") {
+                    sh "packer build -var 'port=$PORT' portAMI.json"
                 }
             }
         }
-        
-        
     }
 }
