@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        GitBranch = "main"
+        GitBranch = "port"
     }
     
     stages {
@@ -10,16 +10,10 @@ pipeline {
                 cleanWs()
             }
         }
-        stage("check Vars"){
-            steps {
-                sh "echo $APP_NAME"
-                sh "echo $ENV"
-            }
-        }
         stage("checkout git") {
             steps {
                 sh "pwd"
-                dir("DeployInfra") {
+                dir("DeployApp") {
                     sh "pwd"
                     git(
                         url: 'git@github.com:Barraque/tpaws.git',
@@ -30,9 +24,9 @@ pipeline {
                 }
             }
         }
-        stage("Deploy Infra") {
+        stage("Deploy APP") {
             steps {
-                dir("DeployInfra") {
+                dir("DeployApp") {
                     sh "pwd"
                     sh "ls"
                     
